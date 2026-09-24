@@ -921,16 +921,132 @@ class MainWindow(QMainWindow):
 
     def apply_current_theme(
         self,
-        theme_name
+        theme_name=None
     ):
 
-        if theme_name == "Black & White":
+        theme = self.theme_manager
 
-            self.apply_style()
+        self.setStyleSheet(
+            f"""
+            QMainWindow {{
+                background-color: {theme.color("window_background")};
+            }}
 
-        elif theme_name == "NWU Professional":
+            #sidebar {{
+                background-color: {theme.color("sidebar_background")};
+            }}
 
-            self.apply_nwu_style()
+            #logo {{
+                color: {theme.color("button_text")};
+                font-size: 19px;
+                font-weight: 800;
+                line-height: 1.2;
+            }}
+
+            #logoSubtitle {{
+                color: {theme.color("sidebar_muted")};
+                font-size: 11px;
+            }}
+
+            #menuButton {{
+                background-color: transparent;
+                color: {theme.color("sidebar_text")};
+                border: none;
+                border-radius: 6px;
+                text-align: left;
+                padding: 11px 13px;
+                font-size: 13px;
+            }}
+
+            #menuButton:hover {{
+                background-color: {theme.color("menu_hover")};
+                color: {theme.color("button_text")};
+            }}
+
+            #menuButton:checked {{
+                background-color: {theme.color("menu_selected")};
+                color: {theme.color("button_text")};
+                font-weight: 600;
+            }}
+
+            #projectListWidget {{
+                background-color: transparent;
+            }}
+
+            #projectMenuButton {{
+                background-color: transparent;
+                color: {theme.color("sidebar_muted")};
+                border: none;
+                border-radius: 5px;
+                text-align: left;
+                padding: 8px 10px;
+                font-size: 12px;
+            }}
+
+            #projectMenuButton:hover {{
+                background-color: {theme.color("menu_hover")};
+                color: {theme.color("button_text")};
+            }}
+
+            #projectMenuButton:checked {{
+                background-color: {theme.color("menu_selected")};
+                color: {theme.color("button_text")};
+                font-weight: 600;
+            }}
+
+            #offlineLabel {{
+                color: {theme.color("sidebar_muted")};
+                font-size: 10px;
+                padding: 8px;
+            }}
+
+            #workspace {{
+                background-color: {theme.color("workspace_background")};
+            }}
+
+            #workspaceTitle {{
+                color: {theme.color("primary_text")};
+                font-size: 20px;
+                font-weight: 700;
+            }}
+
+            #projectStatus {{
+                color: {theme.color("secondary_text")};
+                font-size: 12px;
+                font-weight: 600;
+            }}
+
+            #fileStatus {{
+                color: {theme.color("muted_text")};
+                font-size: 12px;
+            }}
+
+            #themeLabel {{
+                color: {theme.color("secondary_text")};
+                font-size: 12px;
+                font-weight: 600;
+            }}
+
+            #themeSelector {{
+                background-color: {theme.color("input_background")};
+                color: {theme.color("input_text")};
+                border: 1px solid {theme.color("input_border")};
+                border-radius: 5px;
+                padding: 6px 10px;
+                min-width: 145px;
+            }}
+
+            #themeSelector:hover {{
+                border: 1px solid {theme.color("accent")};
+            }}
+
+            #placeholderLabel {{
+                color: {theme.color("muted_text")};
+                font-size: 16px;
+            }}
+            """
+        )
+
     # =========================================================
     # REFRESH PAGE THEMES
     # =========================================================
@@ -966,252 +1082,3 @@ class MainWindow(QMainWindow):
         ):
 
             self.mapping_page.apply_theme()
-    # =========================================================
-    # BLACK & WHITE STYLE
-    # =========================================================
-
-    def apply_style(self):
-
-        self.setStyleSheet("""
-
-        QMainWindow {
-            background-color: #f4f5f6;
-        }
-
-        #sidebar {
-            background-color: #252a2f;
-        }
-
-        #logo {
-            color: white;
-            font-size: 19px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        #logoSubtitle {
-            color: #9da5ad;
-            font-size: 11px;
-        }
-
-        #menuButton {
-            background-color: transparent;
-            color: #c7ccd1;
-            border: none;
-            border-radius: 6px;
-            text-align: left;
-            padding: 11px 13px;
-            font-size: 13px;
-        }
-
-        #menuButton:hover {
-            background-color: #30363c;
-            color: white;
-        }
-
-        #menuButton:checked {
-            background-color: #3a4148;
-            color: white;
-            font-weight: 600;
-        }
-
-        #projectListWidget {
-            background-color: transparent;
-        }
-
-        #projectMenuButton {
-            background-color: transparent;
-            color: #9fa7af;
-            border: none;
-            border-radius: 5px;
-            text-align: left;
-            padding: 8px 10px;
-            font-size: 12px;
-        }
-
-        #projectMenuButton:hover {
-            background-color: #30363c;
-            color: white;
-        }
-
-        #projectMenuButton:checked {
-            background-color: #3a4148;
-            color: white;
-            font-weight: 600;
-        }
-
-        #offlineLabel {
-            color: #aeb5bc;
-            font-size: 10px;
-            padding: 8px;
-        }
-
-        #workspace {
-            background-color: #f4f5f6;
-        }
-
-        #workspaceTitle {
-            color: #20242a;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        #projectStatus {
-            color: #4d555e;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        #fileStatus {
-            color: #737c86;
-            font-size: 12px;
-        }
-
-        #themeLabel {
-            color: #4d555e;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        #themeSelector {
-            background-color: white;
-            color: #30363d;
-            border: 1px solid #d2d7db;
-            border-radius: 5px;
-            padding: 6px 10px;
-            min-width: 145px;
-        }
-
-        #placeholderLabel {
-            color: #8a929a;
-            font-size: 16px;
-        }
-
-        """)
-
-    # =========================================================
-    # NWU PROFESSIONAL STYLE
-    # =========================================================
-
-    def apply_nwu_style(self):
-
-        self.setStyleSheet("""
-
-        QMainWindow {
-            background-color: #f4f5f6;
-        }
-
-        #sidebar {
-            background-color: #181512;
-        }
-
-        #logo {
-            color: white;
-            font-size: 19px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        #logoSubtitle {
-            color: #78848e;
-            font-size: 11px;
-        }
-
-        #menuButton {
-            background-color: transparent;
-            color: #d5d9dc;
-            border: none;
-            border-radius: 6px;
-            text-align: left;
-            padding: 11px 13px;
-            font-size: 13px;
-        }
-
-        #menuButton:hover {
-            background-color: #30383d;
-            color: white;
-        }
-
-        #menuButton:checked {
-            background-color: #00889c;
-            color: white;
-            font-weight: 600;
-        }
-
-        #projectListWidget {
-            background-color: transparent;
-        }
-
-        #projectMenuButton {
-            background-color: transparent;
-            color: #aeb7bd;
-            border: none;
-            border-radius: 5px;
-            text-align: left;
-            padding: 8px 10px;
-            font-size: 12px;
-        }
-
-        #projectMenuButton:hover {
-            background-color: #30383d;
-            color: white;
-        }
-
-        #projectMenuButton:checked {
-            background-color: #00889c;
-            color: white;
-            font-weight: 600;
-        }
-
-        #offlineLabel {
-            color: #78848e;
-            font-size: 10px;
-            padding: 8px;
-        }
-
-        #workspace {
-            background-color: #f4f5f6;
-        }
-
-        #workspaceTitle {
-            color: #181512;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        #projectStatus {
-            color: #4d555e;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        #fileStatus {
-            color: #78848e;
-            font-size: 12px;
-        }
-
-        #themeLabel {
-            color: #4d555e;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        #themeSelector {
-            background-color: white;
-            color: #181512;
-            border: 1px solid #b8c0c5;
-            border-radius: 5px;
-            padding: 6px 10px;
-            min-width: 145px;
-        }
-
-        #themeSelector:hover {
-            border: 1px solid #00889c;
-        }
-
-        #placeholderLabel {
-            color: #78848e;
-            font-size: 16px;
-        }
-
-        """)
