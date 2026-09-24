@@ -626,251 +626,145 @@ class ProjectsPage(QWidget):
         )
 
         # -----------------------------------------------------
-        # DIALOG
+        # KEEP RE-SHOWING THE DIALOG UNTIL THE USER CANCELS
+        # OR THE CHANGES ARE SAVED SUCCESSFULLY
         # -----------------------------------------------------
 
-        dialog = QDialog(
-            self
-        )
+        prefill_name = old_name
+        prefill_description = old_description
 
-        dialog.setWindowTitle(
-            "Edit Project Details"
-        )
+        while True:
 
-        dialog.setMinimumWidth(
-            550
-        )
-
-        dialog.setModal(
-            True
-        )
-
-        layout = QVBoxLayout(
-            dialog
-        )
-
-        layout.setContentsMargins(
-            25,
-            20,
-            25,
-            20
-        )
-
-        layout.setSpacing(
-            12
-        )
-
-        # -----------------------------------------------------
-        # PROJECT NAME
-        # -----------------------------------------------------
-
-        name_label = QLabel(
-            "Project Name"
-        )
-
-        name_label.setObjectName(
-            "dialogLabel"
-        )
-
-        layout.addWidget(
-            name_label
-        )
-
-        name_input = QLineEdit()
-
-        name_input.setText(
-            old_name
-        )
-
-        name_input.setObjectName(
-            "dialogInput"
-        )
-
-        layout.addWidget(
-            name_input
-        )
-
-        # -----------------------------------------------------
-        # DESCRIPTION
-        # -----------------------------------------------------
-
-        description_label = QLabel(
-            "Description"
-        )
-
-        description_label.setObjectName(
-            "dialogLabel"
-        )
-
-        layout.addWidget(
-            description_label
-        )
-
-        description_input = QTextEdit()
-
-        description_input.setPlainText(
-            old_description
-        )
-
-        description_input.setObjectName(
-            "dialogTextEdit"
-        )
-
-        description_input.setMinimumHeight(
-            120
-        )
-
-        layout.addWidget(
-            description_input
-        )
-
-        # -----------------------------------------------------
-        # BUTTONS
-        # -----------------------------------------------------
-
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.Save
-            | QDialogButtonBox.Cancel
-        )
-
-        buttons.accepted.connect(
-            dialog.accept
-        )
-
-        buttons.rejected.connect(
-            dialog.reject
-        )
-
-        layout.addWidget(
-            buttons
-        )
-
-        # -----------------------------------------------------
-        # SHOW DIALOG
-        # -----------------------------------------------------
-
-        result = dialog.exec()
-
-        if result != QDialog.Accepted:
-
-            return
-
-        new_name = name_input.text().strip()
-
-        new_description = (
-            description_input
-            .toPlainText()
-            .strip()
-        )
-
-        # -----------------------------------------------------
-        # VALIDATE NAME
-        # -----------------------------------------------------
-
-        if not new_name:
-
-            QMessageBox.warning(
-                self,
-                "Project Name",
-                "Project name cannot be empty."
+            accepted, new_name, new_description = (
+                self.show_edit_project_dialog(
+                    prefill_name,
+                    prefill_description
+                )
             )
 
-            return
+            if not accepted:
 
-        # -----------------------------------------------------
-        # DETERMINE CHANGES
-        # -----------------------------------------------------
+                return
 
-        name_changed = (
-            new_name != old_name
-        )
+            # ---------------------------------------------------
+            # VALIDATE NAME
+            # ---------------------------------------------------
 
-        description_changed = (
-            new_description != old_description
-        )
+            if not new_name:
 
-        if not name_changed and not description_changed:
+                QMessageBox.warning(
+                    self,
+                    "Project Name",
+                    "Project name cannot be empty."
+                )
 
-            return
+                prefill_name = new_name
+                prefill_description = new_description
 
-        # -----------------------------------------------------
-        # CHANGE PROJECT NAME
-        # -----------------------------------------------------
+                continue
 
-        try:
+            # ---------------------------------------------------
+            # DETERMINE CHANGES
+            # ---------------------------------------------------
 
-            if name_changed:
+            name_changed = (
+                new_name != old_name
+            )
 
-                updated_project = (
-                    self.project_manager.rename_project(
-                        old_name,
-                        new_name
+            description_changed = (
+                new_description != old_description
+            )
+
+            if not name_changed and not description_changed:
+
+                return
+
+            # ---------------------------------------------------
+            # CHANGE PROJECT NAME
+            # ---------------------------------------------------
+
+            try:
+
+                if name_changed:
+
+                    updated_project = (
+                        self.project_manager.rename_project(
+                            old_name,
+                            new_name
+                        )
+                    )
+
+                else:
+
+                    updated_project = (
+                        self.project_manager.open_project(
+                            old_name
+                        )
+                    )
+
+                # -----------------------------------------------
+                # UPDATE DESCRIPTION
+                # -----------------------------------------------
+
+                updated_project["description"] = (
+                    new_description
+                )
+
+                updated_project["last_opened"] = (
+                    datetime_now()
+                )
+
+                self.project_manager.save_project(
+                    new_name,
+                    updated_project
+                )
+
+            except FileExistsError:
+
+                QMessageBox.warning(
+                    self,
+                    "Project Exists",
+                    (
+                        "A project with this name "
+                        "already exists."
                     )
                 )
 
-            else:
+                # Reopen the edit dialog so the user can pick a
+                # different name without starting over.
 
-                updated_project = (
-                    self.project_manager.open_project(
-                        old_name
+                prefill_name = new_name
+                prefill_description = new_description
+
+                continue
+
+            except FileNotFoundError:
+
+                QMessageBox.warning(
+                    self,
+                    "Project Not Found",
+                    (
+                        f"The project '{old_name}' "
+                        "could not be found."
                     )
                 )
 
-            # -------------------------------------------------
-            # UPDATE DESCRIPTION
-            # -------------------------------------------------
+                return
 
-            updated_project["description"] = (
-                new_description
-            )
+            except Exception as error:
 
-            updated_project["last_opened"] = (
-                datetime_now()
-            )
-
-            self.project_manager.save_project(
-                new_name,
-                updated_project
-            )
-
-        except FileExistsError:
-
-            QMessageBox.warning(
-                self,
-                "Project Exists",
-                (
-                    "A project with this name "
-                    "already exists."
+                QMessageBox.critical(
+                    self,
+                    "Edit Project Details",
+                    (
+                        "Could not update the "
+                        f"project details:\n\n{error}"
+                    )
                 )
-            )
 
-            return
+                return
 
-        except FileNotFoundError:
-
-            QMessageBox.warning(
-                self,
-                "Project Not Found",
-                (
-                    f"The project '{old_name}' "
-                    "could not be found."
-                )
-            )
-
-            return
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self,
-                "Edit Project Details",
-                (
-                    "Could not update the "
-                    f"project details:\n\n{error}"
-                )
-            )
-
-            return
+            break
 
         # -----------------------------------------------------
         # UPDATE CURRENT PROJECT IF OPEN
@@ -935,6 +829,152 @@ class ProjectsPage(QWidget):
             "Project Details Updated",
             "Project details updated successfully."
         )
+
+    # =========================================================
+    # SHOW EDIT PROJECT DIALOG
+    # =========================================================
+
+    def show_edit_project_dialog(
+        self,
+        name,
+        description
+    ):
+
+        dialog = QDialog(
+            self
+        )
+
+        dialog.setWindowTitle(
+            "Edit Project Details"
+        )
+
+        dialog.setMinimumWidth(
+            550
+        )
+
+        dialog.setModal(
+            True
+        )
+
+        layout = QVBoxLayout(
+            dialog
+        )
+
+        layout.setContentsMargins(
+            25,
+            20,
+            25,
+            20
+        )
+
+        layout.setSpacing(
+            12
+        )
+
+        # -----------------------------------------------------
+        # PROJECT NAME
+        # -----------------------------------------------------
+
+        name_label = QLabel(
+            "Project Name"
+        )
+
+        name_label.setObjectName(
+            "dialogLabel"
+        )
+
+        layout.addWidget(
+            name_label
+        )
+
+        name_input = QLineEdit()
+
+        name_input.setText(
+            name
+        )
+
+        name_input.setObjectName(
+            "dialogInput"
+        )
+
+        layout.addWidget(
+            name_input
+        )
+
+        # -----------------------------------------------------
+        # DESCRIPTION
+        # -----------------------------------------------------
+
+        description_label = QLabel(
+            "Description"
+        )
+
+        description_label.setObjectName(
+            "dialogLabel"
+        )
+
+        layout.addWidget(
+            description_label
+        )
+
+        description_input = QTextEdit()
+
+        description_input.setPlainText(
+            description
+        )
+
+        description_input.setObjectName(
+            "dialogTextEdit"
+        )
+
+        description_input.setMinimumHeight(
+            120
+        )
+
+        layout.addWidget(
+            description_input
+        )
+
+        # -----------------------------------------------------
+        # BUTTONS
+        # -----------------------------------------------------
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Save
+            | QDialogButtonBox.Cancel
+        )
+
+        buttons.accepted.connect(
+            dialog.accept
+        )
+
+        buttons.rejected.connect(
+            dialog.reject
+        )
+
+        layout.addWidget(
+            buttons
+        )
+
+        # -----------------------------------------------------
+        # SHOW DIALOG
+        # -----------------------------------------------------
+
+        result = dialog.exec()
+
+        if result != QDialog.Accepted:
+
+            return False, "", ""
+
+        new_name = name_input.text().strip()
+
+        new_description = (
+            description_input
+            .toPlainText()
+            .strip()
+        )
+
+        return True, new_name, new_description
 
     # =========================================================
     # DELETE PROJECT

@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from core.type_detector import detect_column_type
+from widgets.common import NO_PROJECT_MESSAGE
 
 
 class MappingPage(QWidget):
@@ -306,7 +307,7 @@ class MappingPage(QWidget):
         if not project:
 
             self.project_label.setText(
-                "No project selected."
+                NO_PROJECT_MESSAGE
             )
 
             self.source_selector.blockSignals(
@@ -322,11 +323,11 @@ class MappingPage(QWidget):
             self.clear_table()
 
             self.info_label.setText(
-                "Open a project first."
+                NO_PROJECT_MESSAGE
             )
 
             self.status_label.setText(
-                "No project selected."
+                "No project open."
             )
 
             return

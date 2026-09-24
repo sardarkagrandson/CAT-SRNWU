@@ -301,14 +301,36 @@ class ProjectManager:
 
         # -----------------------------------------------------
         # PREVENT OVERWRITING ANOTHER PROJECT
+        #
+        # On case-insensitive filesystems (Windows, default
+        # macOS), renaming "Project2" to "project2" makes
+        # new_folder.exists() return True even though it is the
+        # very same folder, not a different existing project.
+        # Detect that case so a pure case change is allowed.
         # -----------------------------------------------------
+
+        same_folder_case_change = False
 
         if new_folder.exists():
 
-            raise FileExistsError(
-                f"A project already exists with the name: "
-                f"{new_name}"
-            )
+            try:
+
+                same_folder_case_change = (
+                    old_folder.samefile(
+                        new_folder
+                    )
+                )
+
+            except OSError:
+
+                same_folder_case_change = False
+
+            if not same_folder_case_change:
+
+                raise FileExistsError(
+                    f"A project already exists with the name: "
+                    f"{new_name}"
+                )
 
         # -----------------------------------------------------
         # CHECK PROJECT FILE
@@ -353,9 +375,31 @@ class ProjectManager:
 
         try:
 
-            old_folder.rename(
-                new_folder
-            )
+            if same_folder_case_change:
+
+                # A direct rename between two names that only
+                # differ by case can silently no-op on a
+                # case-insensitive filesystem, so go through a
+                # temporary intermediate name instead.
+
+                temporary_folder = (
+                    self.base_path
+                    / f"__rename_tmp__{old_name}"
+                )
+
+                old_folder.rename(
+                    temporary_folder
+                )
+
+                temporary_folder.rename(
+                    new_folder
+                )
+
+            else:
+
+                old_folder.rename(
+                    new_folder
+                )
 
         except OSError as error:
 

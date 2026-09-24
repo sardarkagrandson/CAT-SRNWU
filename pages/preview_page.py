@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
 )
 
+from widgets.common import NO_PROJECT_MESSAGE
+
 
 class PreviewPage(QWidget):
 
@@ -275,7 +277,7 @@ class PreviewPage(QWidget):
         if not project:
 
             self.project_label.setText(
-                "No project selected."
+                NO_PROJECT_MESSAGE
             )
 
             self.source_selector.blockSignals(
@@ -291,11 +293,11 @@ class PreviewPage(QWidget):
             self.clear_table()
 
             self.info_label.setText(
-                "Open a project to preview its data."
+                NO_PROJECT_MESSAGE
             )
 
             self.status_label.setText(
-                "No project selected."
+                "No project open."
             )
 
             return
@@ -822,11 +824,57 @@ class PreviewPage(QWidget):
                 border: 1px solid {theme.color("input_border")};
                 border-radius: 5px;
                 padding: 6px;
+                padding-right: 2px;
                 color: {theme.color("input_text")};
             }}
 
             QSpinBox:hover {{
                 border: 1px solid {theme.color("accent")};
+            }}
+
+            QSpinBox::up-button {{
+                subcontrol-origin: border;
+                subcontrol-position: top right;
+                width: 18px;
+                height: 12px;
+                border: none;
+                border-left: 1px solid {theme.color("input_border")};
+                border-top-right-radius: 5px;
+                background-color: {theme.color("input_background")};
+            }}
+
+            QSpinBox::down-button {{
+                subcontrol-origin: border;
+                subcontrol-position: bottom right;
+                width: 18px;
+                height: 12px;
+                border: none;
+                border-left: 1px solid {theme.color("input_border")};
+                border-bottom-right-radius: 5px;
+                background-color: {theme.color("input_background")};
+            }}
+
+            QSpinBox::up-button:hover,
+            QSpinBox::down-button:hover {{
+                background-color: {theme.color("table_header")};
+            }}
+
+            QSpinBox::up-arrow {{
+                width: 7px;
+                height: 7px;
+                image: none;
+                border-left: 3px solid transparent;
+                border-right: 3px solid transparent;
+                border-bottom: 4px solid {theme.color("secondary_text")};
+            }}
+
+            QSpinBox::down-arrow {{
+                width: 7px;
+                height: 7px;
+                image: none;
+                border-left: 3px solid transparent;
+                border-right: 3px solid transparent;
+                border-top: 4px solid {theme.color("secondary_text")};
             }}
 
             #secondaryButton {{

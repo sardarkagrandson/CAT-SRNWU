@@ -17,6 +17,8 @@ class AppState:
 
         self.analysis_results = []
 
+        self.selected_analysis_files = []
+
     def clear(self):
         self.uploaded_files.clear()
         self.selected_file = None
@@ -25,6 +27,7 @@ class AppState:
         self.column_types.clear()
         self.filter_conditions.clear()
         self.analysis_results.clear()
+        self.selected_analysis_files.clear()
 
     @property
     def file_count(self):
