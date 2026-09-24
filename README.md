@@ -16,8 +16,8 @@ mappings and results stay on your computer.
 ### 1. Get the code
 
 ```bash
-git clone https://github.com/sardarkagrandson/custom_analysis_tool.git
-cd custom_analysis_tool
+git clone https://github.com/sardarkagrandson/CAT-SRNWU.git
+cd CAT-SRNWU
 ```
 
 If you already have the project as a folder (e.g. extracted from a `.zip`
@@ -75,7 +75,7 @@ virtual environment and starting it:
 **Windows:**
 
 ```powershell
-cd custom_analysis_tool
+cd CAT-SRNWU
 venv\Scripts\activate
 python main.py
 ```
@@ -83,7 +83,7 @@ python main.py
 **macOS / Linux:**
 
 ```bash
-cd custom_analysis_tool
+cd CAT-SRNWU
 source venv/bin/activate
 python main.py
 ```
